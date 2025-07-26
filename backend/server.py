@@ -294,6 +294,11 @@ async def get_match_scores(match_id: str, team_id: Optional[str] = None):
     
     scores = await db.scores.find({"match_id": match_id}).to_list(1000)
     
+    # Remove MongoDB _id field to avoid serialization issues
+    for score in scores:
+        if "_id" in score:
+            del score["_id"]
+    
     # If match is completed, show all scores
     if match["status"] == MatchStatus.COMPLETED:
         return scores
